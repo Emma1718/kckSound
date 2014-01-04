@@ -1,0 +1,7 @@
+Zeby uruchomic progra mRomka wav.py:
+https://pypi.python.org/pypi/scikits.audiolab/
+pobierasz stąd
+sudo apt-get install python-dev python-numpy python-setuptools libsndfile-dev sudo apt-get install libasound2-dev
+a dopiero potem  sudo python setup.py install w folderze z audiolabem
+
+Romek mowil ze ciezko inaczej wczytac wszystkie pliki, tym podobno wszystko sie ladnie wczytuje. Ja nie wiem, w pliku wavplik.py jest kod Mateusza Rybarskiego ktory niby tez wczytuje okej.
