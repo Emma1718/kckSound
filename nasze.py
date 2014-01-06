@@ -2,12 +2,15 @@
 # -*- coding: utf -*-
 from __future__ import division
 import numpy
+from matplotlib.mlab import find
 from time import time
 import sys
 from pylab import plot, show, subplot, specgram
 from pylab import *
 from numpy import *
 from scipy import *
+import math
+
 import scipy
 from scikits.audiolab import wavread
 from scipy.signal import blackmanharris, fftconvolve
@@ -16,6 +19,12 @@ from numpy.fft import rfft, irfft
 from numpy import argmax, sqrt, mean, diff, log
 from parabolic import parabolic
     #  from scipy.signal import blackmanharris, fftconvolve
+def Pitch(signal):
+    signal = np.fromstring(signal, 'Int16');
+    crossing = [math.copysign(1.0, s) for s in signal]
+    index = find(np.diff(crossing));
+    f0=round(len(index) *sample_frequency /(2*np.prod(len(signal))))
+    return f0;
 
 def freq_from_fft(sig, fs):
     """Estimate frequency from peak of FFT
@@ -56,8 +65,8 @@ def freq_from_autocorr(sig, fs):
 #wczytujemy plik wav
 data, sample_frequency, encoding = wavread("m3.wav")
 
-print 'freq: %f' % freq_from_autocorr(data,sample_frequency)
-
+#print 'freq: %f' % freq_from_autocorr(data,sample_frequency)
+print 'freq: %f' % Pitch(data)
 
 w = 20           # częstotliwość próbkowania [Hz]
 T = 2           # rozważany okres [s]
