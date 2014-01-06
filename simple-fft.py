@@ -13,7 +13,7 @@ t = linspace(0, T, n, endpoint=False) # punkty na osi OX [s]
 
 f = lambda t : sin(2*pi*t)    # def. funkcji
 signal = f(t)                 # funkcja spróbkowana
-
+print signal 
 subplot(211)
 plot(t, signal, '*')
 

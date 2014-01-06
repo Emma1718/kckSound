@@ -9,7 +9,7 @@ from scipy import *
 from scikits.audiolab import wavread
 
 #wczytujemy plik wav
-data, sample_frequency,encoding = wavread("train/002_M.wav")
+data, sample_frequency,encoding = wavread("f2.wav")
 fig = gcf()
 fig.canvas.set_window_title("Gender Recognition")
 
