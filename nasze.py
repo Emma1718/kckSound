@@ -10,7 +10,7 @@ from numpy import *
 from scipy import *
 import scipy
 from scikits.audiolab import wavread
-from scipy.signal import blackmanharris
+from scipy.signal import blackmanharris, fftconvolve
 #from parabolic import parabolic
 from numpy.fft import rfft, irfft
 from numpy import argmax, sqrt, mean, diff, log
@@ -28,16 +28,35 @@ def freq_from_fft(sig, fs):
     # Find the peak and interpolate to get a more accurate peak
     i = argmax(abs(f)) # Just use this for less-accurate, naive version
     print 'i: %f' % i
+    print 'f[i]: %d' % f[i]
     true_i = parabolic(log(abs(f)), i)[0]
     print true_i
     # Convert to equivalent frequency
 
     return fs * true_i
 
+def freq_from_autocorr(sig, fs):
+    """Estimate frequency using autocorrelation
+    """
+    # Calculate autocorrelation (same thing as convolution, but with
+    # one input reversed in time), and throw away the negative lags
+    corr = fftconvolve(sig, sig[::-1], mode='full')
+    corr = corr[len(corr)/2:]
+    # Find the first low point
+    d = diff(corr)
+    start = find(d > 0)[0]
+    # Find the next peak after the low point (other than 0 lag). This bit is
+    # not reliable for long signals, due to the desired peak occurring between
+    # samples, and other peaks appearing higher.
+    # Should use a weighting function to de-emphasize the peaks at longer lags.
+    peak = argmax(corr[start:]) + start
+    px, py = parabolic(corr, peak)
+    return fs / px
+
 #wczytujemy plik wav
 data, sample_frequency, encoding = wavread("m3.wav")
 
-print 'freq: %f' % freq_from_fft(data,sample_frequency)
+print 'freq: %f' % freq_from_autocorr(data,sample_frequency)
 
 
 w = 20           # częstotliwość próbkowania [Hz]
@@ -75,6 +94,7 @@ print fft
 
 w = np.fft.fft(data)
 freqs = np.fft.fftfreq(len(w))
+print 'koperek!'
 print(freqs.min(),freqs.max())
 # (-0.5, 0.499975)
 
