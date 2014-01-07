@@ -10,7 +10,7 @@ from pylab import *
 from numpy import *
 from scipy import *
 import math
-
+from scikits.audiolab import flacread
 import scipy
 from scikits.audiolab import wavread
 from scipy.signal import blackmanharris, fftconvolve
@@ -82,12 +82,12 @@ def freq_from_autocorr(sig, fs):
     # not reliable for long signals, due to the desired peak occurring between
     # samples, and other peaks appearing higher.
     # Should use a weighting function to de-emphasize the peaks at longer lags.
-    peak = argmax(corr[start:]) + start
+    peak = argmax(corr)
     px, py = parabolic(corr, peak)
-    return fs / px
+    return fs * px
 
 #wczytujemy plik wav
-data, sample_frequency, encoding = wavread("f4.wav")
+data, sample_frequency, encoding = wavread("f2.wav")
 
 #print 'freq: %f' % freq_from_autocorr(data,sample_frequency)
 print 'freq: %f' % Pitch(data)
@@ -110,7 +110,7 @@ print len(data)
 
 ft = rfft(data * np.hanning(len(data)))
 mgft = abs(ft)
-xVals = np.fft.rfftfreq(len(data), 1 / float(sample_frequency))
+xVals = np.fft.rfftfreq(len(data), 1/sample_frequency)
 subplot(221)
 plot(abs(xVals[:len(mgft)]), mgft)
 temp = data
@@ -128,17 +128,20 @@ print mean(mgft)
 print fft
 
 w = np.fft.fft(data)
-freqs = np.fft.fftfreq(len(w))
+ws = w # [:(len(w)/2)]
+freqs = np.fft.fftfreq(len(ws))
 print 'koperek!'
 print(freqs.min(),freqs.max())
 # (-0.5, 0.499975)
 
 # Find the peak in the coefficients
-idx=np.argmax(np.abs(w)**2)
+idx=np.argmax(np.abs(ws)**2)
 freq=freqs[idx]
 freq_in_hertz=abs(freq*sample_frequency)
 print 'frequency new: %f' % freq_in_hertz
 # 439.8975
+signal, fs, enc = flacread("l2.flac")
+print 'frequency autocorr: %f' % freq_from_autocorr(signal,fs)
 
 
 fft = scipy.fft(data)
@@ -147,7 +150,7 @@ subplot(222)
 plot(t,data)
 subplot(223)
 plot(t,fft)
-#subplot(224)
-#Pxx, freqs, bins, im = specgram(data, Fs=sample_frequency, NFFT=1024,
-#noverlap=900, cmap=cm.gist_heat)
+subplot(224)
+Pxx, freqs, bins, im = specgram(data, Fs=sample_frequency, NFFT=1024,
+noverlap=900, cmap=cm.gist_heat)
 show()
