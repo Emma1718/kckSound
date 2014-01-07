@@ -43,6 +43,30 @@ def freq_from_fft(sig, fs):
     # Convert to equivalent frequency
 
     return fs * true_i
+def freq_from_HPS(signal, fs):
+    """
+    Estimate frequency using harmonic product spectrum (HPS)
+    """
+    windowed = signal * blackmanharris(len(signal))
+
+    from pylab import subplot, plot, log, copy, show
+
+    #harmonic product spectrum:
+    c = abs(rfft(windowed))
+    maxharms = 8
+    subplot(maxharms,1,1)
+    plot(log(c))
+    for x in range(2,maxharms):
+        a = copy(c[::x]) #Should average or maximum instead of decimating
+        # max(c[::x],c[1::x],c[2::x],...)
+        c = c[:len(a)]
+        i = argmax(abs(c))
+        true_i = parabolic(abs(c), i)[0]
+        print 'Pass %d: %f Hz' % (x, fs * true_i / len(windowed))
+        c *= a
+        subplot(maxharms,1,x)
+        plot(log(c))
+    show()
 
 def freq_from_autocorr(sig, fs):
     """Estimate frequency using autocorrelation
@@ -63,10 +87,12 @@ def freq_from_autocorr(sig, fs):
     return fs / px
 
 #wczytujemy plik wav
-data, sample_frequency, encoding = wavread("m3.wav")
+data, sample_frequency, encoding = wavread("f4.wav")
 
 #print 'freq: %f' % freq_from_autocorr(data,sample_frequency)
 print 'freq: %f' % Pitch(data)
+print 'sf: %f' % sample_frequency
+print 'encoding: %s' % encoding
 
 w = 20           # częstotliwość próbkowania [Hz]
 T = 2           # rozważany okres [s]
@@ -82,7 +108,7 @@ print len(freq)
 print len(data)
 
 
-ft = np.fft.rfft(data * np.hanning(len(data)))
+ft = rfft(data * np.hanning(len(data)))
 mgft = abs(ft)
 xVals = np.fft.rfftfreq(len(data), 1 / float(sample_frequency))
 subplot(221)

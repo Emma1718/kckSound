@@ -150,7 +150,7 @@ def recognition(WAVE_OUTPUT_FILENAME):
 
 if __name__ == '__main__':
 
-    #recording_wav()
+    recording_wav()
     #graph_spectrogram(WAVE_OUTPUT_FILENAME)
     power(WAVE_OUTPUT_FILENAME)
     recognition(WAVE_OUTPUT_FILENAME)
